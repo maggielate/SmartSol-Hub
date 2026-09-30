@@ -64,11 +64,7 @@ export default function Dashboard() {
               {n.label}
             </Link>
           ))}
-          <span style={{ color: '#64748b', fontSize: 13, padding: '6px 14px' }}>{user.name}</span>
-          <button onClick={() => { localStorage.clear(); window.location.href = '/login'; }}
-            style={{ background: '#ef4444', border: 'none', color: '#fff', padding: '6px 14px', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>
-            Logout
-          </button>
+
         </div>
       </nav>
 
