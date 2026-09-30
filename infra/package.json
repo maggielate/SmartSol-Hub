@@ -1,0 +1,17 @@
+{
+  "name": "smartsol-infra",
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "cdk deploy",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "destroy": "cdk destroy"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.115.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.115.0"
+  }
+}

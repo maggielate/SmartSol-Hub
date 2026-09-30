@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dashboard/build/
+mobile/android/
+mobile/ios/
+
+# Environment files (sensitive)
+backend/.env
+**/.env.local
+
+# Logs
+*.log
+backend/backend.log
+
+# Python
+__pycache__/
+ai/models/*.pkl
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

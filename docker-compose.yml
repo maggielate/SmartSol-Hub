@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: smartsol
+      POSTGRES_USER: smartsol_user
+      POSTGRES_PASSWORD: localpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: smartsol
+      DB_USER: smartsol_user
+      DB_PASSWORD: localpassword
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_secret_change_in_prod
+      JWT_EXPIRES_IN: 7d
+      AI_SERVICE_URL: http://ai:5001
+    depends_on:
+      - postgres
+      - redis
+      - ai
+    volumes:
+      - ./backend/src:/app/src
+
+  ai:
+    build: ./ai
+    ports:
+      - "5001:5001"
+    command: python app.py
+
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "3001:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:3000/api
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
