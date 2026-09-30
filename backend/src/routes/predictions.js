@@ -4,7 +4,7 @@ const pool = require('../db/pool');
 const { authenticate } = require('../middleware/auth');
 
 // Get latest prediction for a unit
-router.get('/:unitId', authenticate, async (req, res, next) => {
+router.get('/:unitId', async (req, res, next) => {
   try {
     const { rows } = await pool.query(
       `SELECT * FROM energy_predictions WHERE unit_id=$1 ORDER BY created_at DESC LIMIT 7`,
@@ -15,7 +15,7 @@ router.get('/:unitId', authenticate, async (req, res, next) => {
 });
 
 // Trigger new prediction (admin or scheduled job)
-router.post('/:unitId/predict', authenticate, async (req, res, next) => {
+router.post('/:unitId/predict', async (req, res, next) => {
   try {
     // Fetch last 30 days of telemetry for the AI model
     const { rows: history } = await pool.query(

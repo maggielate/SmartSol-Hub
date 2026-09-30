@@ -8,13 +8,7 @@ api.interceptors.request.use(cfg => {
   return cfg;
 });
 
-api.interceptors.response.use(r => r, err => {
-  if (err.response?.status === 401) {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-  }
-  return Promise.reject(err);
-});
+api.interceptors.response.use(r => r, err => Promise.reject(err));
 
 export const auth = {
   login: (phone, password) => api.post('/auth/login', { phone, password }),

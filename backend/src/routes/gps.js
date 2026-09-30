@@ -1,12 +1,10 @@
 const router = require('express').Router();
 const { LocationClient, BatchUpdateDevicePositionCommand } = require('@aws-sdk/client-location');
 const pool = require('../db/pool');
-const { authenticate, authorize } = require('../middleware/auth');
 
 const location = new LocationClient({ region: process.env.AWS_REGION });
 
-// Update unit GPS position (called by device or installer)
-router.post('/:unitId/location', authenticate, async (req, res, next) => {
+router.post('/:unitId/location', async (req, res, next) => {
   try {
     const { latitude, longitude, address } = req.body;
     const { unitId } = req.params;
@@ -34,9 +32,8 @@ router.post('/:unitId/location', authenticate, async (req, res, next) => {
 });
 
 // Get all unit locations (for map view)
-router.get('/map', authenticate, async (req, res, next) => {
+router.get('/map', async (req, res, next) => {
   try {
-    const isAdmin = req.user.role === 'admin';
     const { rows } = await pool.query(
       `SELECT su.id, su.serial_number, su.unit_type, su.is_active,
               l.latitude, l.longitude, l.address, l.recorded_at,
@@ -44,15 +41,14 @@ router.get('/map', authenticate, async (req, res, next) => {
        FROM solar_units su
        LEFT JOIN LATERAL (SELECT * FROM unit_locations WHERE unit_id=su.id ORDER BY recorded_at DESC LIMIT 1) l ON true
        LEFT JOIN LATERAL (SELECT battery_soc, solar_power_w FROM telemetry WHERE unit_id=su.id ORDER BY recorded_at DESC LIMIT 1) t ON true
-       WHERE ${isAdmin ? 'true' : 'su.owner_id=$1'} AND l.latitude IS NOT NULL`,
-      isAdmin ? [] : [req.user.id]
+       WHERE l.latitude IS NOT NULL`
     );
     res.json(rows);
   } catch (err) { next(err); }
 });
 
 // Get location history for a unit
-router.get('/:unitId/history', authenticate, authorize('admin'), async (req, res, next) => {
+router.get('/:unitId/history', async (req, res, next) => {
   try {
     const { rows } = await pool.query(
       `SELECT * FROM unit_locations WHERE unit_id=$1 ORDER BY recorded_at DESC LIMIT 100`,

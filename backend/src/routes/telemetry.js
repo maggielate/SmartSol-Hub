@@ -23,7 +23,7 @@ router.post('/ingest', async (req, res, next) => {
 });
 
 // Get telemetry history for a unit
-router.get('/:unitId', authenticate, async (req, res, next) => {
+router.get('/:unitId', async (req, res, next) => {
   try {
     const { hours = 24 } = req.query;
     const { rows } = await pool.query(
@@ -37,7 +37,7 @@ router.get('/:unitId', authenticate, async (req, res, next) => {
 });
 
 // Get aggregated daily stats
-router.get('/:unitId/daily', authenticate, async (req, res, next) => {
+router.get('/:unitId/daily', async (req, res, next) => {
   try {
     const { rows } = await pool.query(
       `SELECT DATE(recorded_at) as date,
